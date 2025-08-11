@@ -183,14 +183,14 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <nav class="nav flex-column">
-        <a href="{{ url('/Dashboard') }}"><i class="bi bi-box-seam"></i> DashBoard</a>
+        <a href="{{ url('/dashboard') }}"><i class="bi bi-app"></i> DashBoard</a>
         <a href="{{ url('/pharmacy/inventory') }}"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="{{ url('/pharmacy/entry') }}"><i class="bi bi-pencil-square"></i> Entry</a>
         <a href="{{ url('/pharmacy/adjust') }}"><i class="bi bi-sliders"></i> Adjust</a>
         <a href="{{ url('/pharmacy/import') }}"><i class="bi bi-cloud-arrow-down"></i> Import</a>
-        <a href="{{ url('/pharmacy/predictions') }}"><i class="bi bi-exclamation-triangle"></i> Predictions</a>
-        <a href="{{ url('/pharmacy/alerts') }}"><i class="bi bi-exclamation-triangle"></i> Alerts</a>
-        <a href="{{ url('/pharmacy/history') }}"><i class="bi bi-square"></i> History</a>
+        <a href="{{ url('/pharmacy/predictions') }}"><i class="bi bi-question-diamond"></i></i> Predictions</a>
+        <a href="{{ url('/medicine-request') }}"><i class="bi bi-arrow-down-right-square"></i></i>Requests</a>
+        <a href="{{ url('/pharmacy/history') }}"><i class="bi bi-hourglass-split"></i> History</a>
       </nav>
     </aside>
 

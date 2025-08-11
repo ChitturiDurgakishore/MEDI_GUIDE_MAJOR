@@ -14,6 +14,7 @@ use App\Models\PharmacySale;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\MedicineRequest;
 
 class PharmaController extends Controller
 {
@@ -43,7 +44,9 @@ class PharmaController extends Controller
         if ($status) {
             $request->session()->put('Pharmacy', $status->pharmacy_name);
             $request->session()->put('Pharmacy_id', $status->id);
-            return view('Pharma.dashboard');
+            return redirect()->route('pharma.dashboard');
+
+
         }
     }
 
@@ -52,6 +55,26 @@ class PharmaController extends Controller
         session()->flush();
         return redirect('/Login');
     }
+
+
+public function dashboard(Request $request)
+{
+    $pharmacyId = $request->session()->get('Pharmacy_id');
+
+    $today = Carbon::today();
+    $monthStart = Carbon::now()->startOfMonth();
+
+    $todaySales = PharmacySale::where('pharmacy_id', $pharmacyId)
+        ->whereDate('sold_at', $today)
+        ->sum(DB::raw('quantity_sold * price_at_sale'));
+
+    $monthSales = PharmacySale::where('pharmacy_id', $pharmacyId)
+        ->whereBetween('sold_at', [$monthStart, Carbon::now()])
+        ->sum(DB::raw('quantity_sold * price_at_sale'));
+
+    return view('Pharma.dashboard', compact('todaySales', 'monthSales'));
+}
+
 
     public function inventoryDetails(Request $request)
     {
@@ -526,10 +549,85 @@ class PharmaController extends Controller
         return view('Pharma.customerhistory', ['customers' => $customer]);
     }
 
+
+    public function showCustomerHistory(Request $request)
+    {
+        $search = $request->input('search');
+
+        if ($search) {
+            $customers=PharmacySale::where('customer_mobile', 'like', '%' . $search . '%');
+        }
+
+        // ✅ Get unique customer_mobile rows (grouped)
+        $customers = $customers
+            ->select('customer_mobile')
+            ->groupBy('customer_mobile')
+            ->get();
+
+        return view('Pharma.customerhistory', [
+            'customers' => $customers
+        ]);
+    }
+
+
     public function CustomerHistory(Request $req, $mobile)
     {
         $pharmacyId = session('Pharmacy_id');
         $customer = PharmacySale::where('pharmacy_id', $pharmacyId)->where('customer_mobile', $mobile)->get();
-        return $customer;
+        return view('Pharma.sales', ['MainContent' => $customer]);
     }
+
+
+    public function medicineRequestsPage()
+    {
+        // Fetch all medicine requests to show in the "Previous Requests" tab
+        $requests = MedicineRequest::latest()->get();
+
+        // Pass the requests to the single combined view
+        return view('Pharma.medicine_request_form', compact('requests'));
+    }
+
+    public function storeMedicineRequest(Request $request)
+    {
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_mobile' => 'required|string|max:15',
+            'medicine_name' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+            // 'status' is optional; you can skip validation or include if you want
+        ]);
+
+        MedicineRequest::create($validated);
+
+        return redirect()->back()->with('success', 'Medicine request saved successfully!');
+    }
+
+    public function updateMedicineRequestStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,fulfilled,cancelled',
+        ]);
+
+        $medicineRequest = MedicineRequest::findOrFail($id);
+        $medicineRequest->status = $validated['status'];
+        $medicineRequest->save();
+
+        return redirect()->back()->with('success', 'Status updated successfully!');
+    }
+
+    public function listMedicineRequests(Request $request)
+{
+    $query = MedicineRequest::query();
+
+    if ($request->filled('mobile')) {
+        $mobile = $request->input('mobile');
+        // Filter rows with mobile containing the input (partial match)
+        $query->where('customer_mobile', 'like', "%{$mobile}%");
+    }
+
+    $requests = $query->latest()->get();
+
+    return view('Pharma.medicine_request_list', compact('requests'));
+}
+
 }

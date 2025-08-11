@@ -48,7 +48,7 @@ class UsersController extends Controller
         $userLon = $request->user_longitude;
 
         // Step 5: Get pharmacies that have this medicine
-        $availability = MedicineAvailability::where('medicine_name', $inputName)->pluck('pharmacy_id');
+        $availability = MedicineAvailability::where('medicine_name', $inputName)->where('quantity','>',0)->pluck('pharmacy_id');
 
         // Step 6: Get nearby pharmacies if location available, else all pharmacies with medicine
         if ($userLat && $userLon) {

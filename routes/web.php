@@ -19,7 +19,7 @@ Route::view('/Register','Pharma.Register');
 Route::post('/Registering',[PharmaController::class,'Registered']);
 Route::get('/logout',[PharmaController::class,'Logout']);
 //Options Pharmacy
-Route::view('/Dashboard','Pharma.dashboard');
+Route::get('/dashboard', [PharmaController::class, 'dashboard'])->name('pharma.dashboard');
 Route::get('/pharmacy/inventory',[PharmaController::class,'InventoryDetails']);
 Route::get('/autocomplete', [PharmaController::class, 'autocomplete']);
 Route::get('/autocompletewhole',[PharmaController::class,'autocompletewhole']);
@@ -33,6 +33,13 @@ Route::post('/pharmacy/import/csv',[PharmaController::class,'import']);
 Route::get('/pharmacy/predictions',[PharmaController::class,'Prediction']);
 Route::get('/pharmacy/history',[PharmaController::class,'UserHistory']);
 Route::get('customer-details/{mobile}',[PharmaController::class,'CustomerHistory']);
+Route::get('/customer-history', [PharmaController::class, 'showCustomerHistory']);
+// Show the combined form + list page
+Route::get('/medicine-request', [PharmaController::class, 'medicineRequestsPage']);
+
+// Store new medicine request
+Route::post('/medicine-request', [PharmaController::class, 'storeMedicineRequest']);
+Route::post('/medicine-request/{id}/update-status', [PharmaController::class, 'updateMedicineRequestStatus'])->name('medicine-request.update-status');
 
 
 
