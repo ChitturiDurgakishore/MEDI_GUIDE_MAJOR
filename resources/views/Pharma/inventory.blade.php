@@ -1,35 +1,54 @@
 <x-pharma-layout>
     <x-slot name="MainContent">
+
+        <!-- Responsive Meta Tag -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <!-- Bootstrap & jQuery -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+        <style>
+            /* Ensure suggestion box appears above all */
+            #suggestion-box {
+                z-index: 1050; /* Higher than Bootstrap modals */
+                max-height: 200px;
+                overflow-y: auto;
+                background-color: white;
+                color: black;
+                border: 1px solid #ced4da;
+                border-radius: 0 0 0.375rem 0.375rem;
+            }
+
+            /* Make table scroll horizontally on small devices */
+            .table-responsive {
+                overflow-x: auto;
+            }
+        </style>
+
         <div class="container mt-5">
+
             <h2 class="mb-4 text-center">🧾 Pharmacy Inventory</h2>
 
             <!-- Search Form -->
-            <form method="POST" action="{{ url('/InventorySearch') }}" class="row mb-4 position-relative">
+            <form method="POST" action="{{ url('/InventorySearch') }}" class="row mb-4 position-relative" autocomplete="off">
                 @csrf
-                <div class="col-md-9 position-relative">
+                <div class="col-12 col-md-9 position-relative mb-2 mb-md-0">
                     <input type="text" name="search" id="search-box" placeholder="Search medicine..."
-                           value="{{ request('search') }}" autocomplete="off"
-                           class="form-control" />
+                        value="{{ request('search') }}" class="form-control" />
 
                     <!-- Autocomplete Suggestions -->
-                    <div id="suggestion-box"
-                         class="list-group position-absolute w-100"
-                         style="z-index: 1000; max-height: 200px; overflow-y: auto; color:black; background-color:white">
-                    </div>
+                    <div id="suggestion-box" class="list-group position-absolute w-100" style="display:none;"></div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-12 col-md-3">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
                 </div>
             </form>
 
-            <!-- Inventory Table -->
+            <!-- Inventory Table Responsive Wrapper -->
             <div class="card shadow">
-                <div class="card-body p-0">
+                <div class="card-body p-0 table-responsive">
                     <table class="table table-striped mb-0">
                         <thead class="table-dark">
                             <tr>
@@ -42,7 +61,7 @@
                             @forelse ($inventory as $inven)
                                 <tr>
                                     <td>{{ $inven->medicine_name }}</td>
-                                    <td>{{ $inven->price }}</td>
+                                    <td>{{ number_format($inven->price, 2) }}</td>
                                     <td>{{ $inven->quantity }}</td>
                                 </tr>
                             @empty
@@ -82,6 +101,9 @@
                                     output = '<div class="list-group-item text-muted">No results</div>';
                                 }
                                 $('#suggestion-box').html(output).show();
+                            },
+                            error: function () {
+                                $('#suggestion-box').html('<div class="list-group-item text-danger">Error loading suggestions.</div>').show();
                             }
                         });
                     } else {
@@ -96,7 +118,7 @@
                     $('#suggestion-box').hide();
                 });
 
-                // Hide on outside click
+                // Hide suggestions on outside click
                 $(document).click(function (e) {
                     if (!$(e.target).closest('#search-box, #suggestion-box').length) {
                         $('#suggestion-box').hide();

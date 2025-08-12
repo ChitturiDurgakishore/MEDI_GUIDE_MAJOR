@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pharmacy Details - Medi-Guide</title>
 
     <!-- Bootstrap CSS -->
@@ -58,28 +58,44 @@
             border: 0;
             border-radius: 12px;
             width: 100%;
-            height: 100%;
             min-height: 300px;
         }
 
+        /* Container for pharmacy info and map */
         .details-container {
             display: flex;
             flex-direction: column;
+            gap: 1.5rem;
         }
 
+        /* Add spacing between paragraphs */
+        .details-container p {
+            margin-bottom: 0.75rem;
+        }
+
+        /* On medium+ screens, display info and map side-by-side */
         @media (min-width: 768px) {
             .details-container {
                 flex-direction: row;
                 gap: 2rem;
             }
 
-            .pharmacy-info {
-                flex: 1;
-            }
-
+            .pharmacy-info,
             .map-container {
                 flex: 1;
+                max-width: 48%;
+                padding: 0 1rem;
             }
+
+            iframe {
+                height: 350px;
+            }
+        }
+
+        /* Back button container styling */
+        .back-button-container {
+            margin-top: 1.5rem;
+            text-align: center;
         }
     </style>
 </head>
@@ -140,14 +156,12 @@
             </div>
 
             <!-- Back Button -->
-            <div class="mt-4 text-center">
-                <form action="{{ url('/Result') }}" method="POST" class="text-center mt-4">
+            <div class="back-button-container">
+                <form action="{{ url('/Result') }}" method="POST" class="d-inline-block">
                     @csrf
-                    <input type="hidden" name="MedicineName"
-                        value="{{ $medicinename}}">
+                    <input type="hidden" name="MedicineName" value="{{ $medicinename }}">
                     <button type="submit" class="btn btn-outline-light btn-sm">&larr; Back</button>
                 </form>
-
             </div>
         @else
             <p class="text-danger text-center">Pharmacy details not found.</p>

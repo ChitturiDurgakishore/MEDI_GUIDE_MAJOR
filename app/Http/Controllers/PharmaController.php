@@ -32,7 +32,7 @@ class PharmaController extends Controller
             'longitude' => $request->longitude,
         ]);
         if ($status) {
-            return "Successfully Registered";
+            return redirect('/Login');
         }
     }
 
@@ -45,8 +45,6 @@ class PharmaController extends Controller
             $request->session()->put('Pharmacy', $status->pharmacy_name);
             $request->session()->put('Pharmacy_id', $status->id);
             return redirect()->route('pharma.dashboard');
-
-
         }
     }
 

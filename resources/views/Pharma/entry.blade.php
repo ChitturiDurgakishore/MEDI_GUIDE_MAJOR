@@ -1,10 +1,13 @@
 <x-pharma-layout>
     <x-slot name="MainContent">
-        <!-- Bootstrap & jQuery -->
+
+        <!-- Responsive Meta Tag -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        <!-- 🌌 Neon Dark UI Styling (Same as Inventory Page) -->
         <style>
             body {
                 background-color: #0d1117;
@@ -70,57 +73,66 @@
                 background-color: #21262d;
                 color: #58a6ff;
             }
+
+            @media (max-width: 768px) {
+                h2 {
+                    font-size: 1.4rem;
+                    text-align: center;
+                }
+
+                .form-label {
+                    font-size: 0.9rem;
+                }
+
+                .btn {
+                    font-size: 0.9rem;
+                }
+            }
         </style>
-        <div class="container mt-5">
+
+        <div class="container mt-4 mb-5">
             <h2 class="mb-4 text-center">➕ Add New Medicine Entry</h2>
+
             @if (session('success'))
-                <div class="container mt-4">
-                    <div class="alert alert-success alert-dismissible fade show rounded-lg shadow py-3 px-4"
-                        role="alert">
-                        {!! session('success') !!}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {!! session('success') !!}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            <!-- Medicine Entry Form -->
-            <div class="card shadow mb-5">
-                <div class="card-body p-4">
-                    <form method="post" action="{{ url('/inventory/add-medicine') }}">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="POST" action="{{ url('/inventory/add-medicine') }}">
                         @csrf
                         <input type="hidden" name="pharmacy_id" value="{{ session('Pharmacy_id') }}">
 
                         <div class="mb-3 position-relative">
                             <label for="medicine-name" class="form-label">Medicine Name</label>
-                            <input type="text" name="medicine_name" id="medicine-name" class="form-control" required
-                                autocomplete="off" placeholder="Enter medicine name...">
+                            <input type="text" name="medicine_name" id="medicine-name" class="form-control" required autocomplete="off" placeholder="Enter medicine name...">
                             <div id="suggestion-box" class="list-group position-absolute w-100"
-                                style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;">
-                            </div>
+                                 style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
                         </div>
 
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" name="quantity" id="quantity" class="form-control" required
-                                min="1" placeholder="Enter quantity...">
+                            <input type="number" name="quantity" id="quantity" class="form-control" required min="1" placeholder="Enter quantity...">
                         </div>
 
                         <div class="mb-4">
                             <label for="price" class="form-label">Price (₹)</label>
-                            <input type="number" name="price" id="price" class="form-control" required
-                                step="0.01" min="0" placeholder="Enter price...">
+                            <input type="number" name="price" id="price" class="form-control" required step="0.01" min="0" placeholder="Enter price...">
                         </div>
 
-                        <button type="submit" class="btn btn-success w-100 py-2">Add Medicine</button>
+                        <button type="submit" class="btn btn-success w-100">Add Medicine</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- AJAX Autocomplete Script -->
+        <!-- 🔄 AJAX Autocomplete -->
         <script>
-            $(document).ready(function() {
-                $('#medicine-name').on('keyup', function() {
+            $(document).ready(function () {
+                $('#medicine-name').on('keyup', function () {
                     let query = $(this).val();
                     let suggestionBox = $('#suggestion-box');
 
@@ -128,27 +140,20 @@
                         $.ajax({
                             url: "{{ url('/autocompletewhole') }}",
                             method: "GET",
-                            data: {
-                                query: query
-                            },
-                            success: function(data) {
+                            data: { query: query },
+                            success: function (data) {
                                 let output = '';
                                 if (data.length > 0) {
-                                    data.forEach(function(item) {
-                                        output +=
-                                            `<a href="#" class="list-group-item list-group-item-action">${item.medicinename}</a>`;
+                                    data.forEach(function (item) {
+                                        output += `<a href="#" class="list-group-item list-group-item-action">${item.medicinename}</a>`;
                                     });
                                 } else {
-                                    output =
-                                        '<div class="list-group-item text-muted">No results</div>';
+                                    output = '<div class="list-group-item text-muted">No results</div>';
                                 }
                                 suggestionBox.html(output).show();
                             },
-                            error: function(xhr, status, error) {
-                                console.error("Autocomplete AJAX error:", status, error);
-                                suggestionBox.html(
-                                    '<div class="list-group-item text-danger">Error loading suggestions.</div>'
-                                ).show();
+                            error: function () {
+                                suggestionBox.html('<div class="list-group-item text-danger">Error loading suggestions.</div>').show();
                             }
                         });
                     } else {
@@ -156,13 +161,13 @@
                     }
                 });
 
-                $(document).on('click', '#suggestion-box a', function(e) {
+                $(document).on('click', '#suggestion-box a', function (e) {
                     e.preventDefault();
                     $('#medicine-name').val($(this).text());
                     $('#suggestion-box').hide();
                 });
 
-                $(document).click(function(e) {
+                $(document).click(function (e) {
                     if (!$(e.target).closest('#medicine-name, #suggestion-box').length) {
                         $('#suggestion-box').hide();
                     }

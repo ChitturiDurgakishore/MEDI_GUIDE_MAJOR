@@ -53,21 +53,60 @@
                 border: 1px solid #30363d;
             }
 
-            #suggestion-box {
+            .suggestion-box {
                 background-color: #161b22;
                 border: 1px solid #30363d;
                 color: #c9d1d9;
+                position: absolute;
+                z-index: 1000;
+                width: 100%;
+                max-height: 200px;
+                overflow-y: auto;
+                display: none;
             }
 
-            #suggestion-box .list-group-item {
+            .suggestion-box .list-group-item {
                 background-color: #161b22;
                 color: #c9d1d9;
                 border: none;
             }
 
-            #suggestion-box .list-group-item:hover {
+            .suggestion-box .list-group-item:hover {
                 background-color: #21262d;
                 color: #58a6ff;
+            }
+
+            .medicine-row {
+                position: relative;
+            }
+
+            @media (max-width: 768px) {
+                .medicine-row {
+                    flex-direction: column;
+                }
+
+                .medicine-row .col-md-7,
+                .medicine-row .col-md-3,
+                .medicine-row .col-md-2 {
+                    width: 100%;
+                    margin-bottom: 1rem;
+                }
+
+                .remove-row {
+                    margin-top: 0.5rem;
+                }
+
+                h2 {
+                    font-size: 1.25rem;
+                }
+
+                .btn {
+                    font-size: 0.95rem;
+                }
+
+                .text-center a.btn {
+                    width: 100%;
+                }
             }
         </style>
 
@@ -85,7 +124,7 @@
                                 <div class="col-md-7">
                                     <label class="form-label">Medicine Name</label>
                                     <input type="text" name="medicine_name[]" class="form-control medicine-name" placeholder="Enter medicine name..." autocomplete="off" required>
-                                    <div class="suggestion-box list-group position-absolute w-100" style="z-index: 1000; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                    <div class="suggestion-box list-group"></div>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Quantity</label>
@@ -101,13 +140,12 @@
                         <button type="submit" class="btn btn-success w-100 py-2">Submit All & Generate Bill</button>
                     </form>
 
-                    {{-- Show PDF link if available --}}
                     @if(session('pdf_path'))
-                    <div class="mt-4 text-center">
-                        <a href="{{ session('pdf_path') }}" target="_blank" class="btn btn-primary px-4 py-2" style="font-weight: 600; font-size: 1.1rem;">
-                            📄 View / Download Generated Bill PDF
-                        </a>
-                    </div>
+                        <div class="mt-4 text-center">
+                            <a href="{{ session('pdf_path') }}" target="_blank" class="btn btn-primary px-4 py-2" style="font-weight: 600; font-size: 1.1rem;">
+                                📄 View / Download Generated Bill PDF
+                            </a>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -115,7 +153,7 @@
 
         <script>
             function bindAutocomplete(input) {
-                input.on('keyup', function() {
+                input.on('keyup', function () {
                     let query = $(this).val();
                     let suggestionBox = $(this).siblings('.suggestion-box');
 
@@ -124,10 +162,10 @@
                             url: "{{ url('/autocompletewhole') }}",
                             method: "GET",
                             data: { query: query },
-                            success: function(data) {
+                            success: function (data) {
                                 let output = '';
                                 if (data.length > 0) {
-                                    data.forEach(function(item) {
+                                    data.forEach(function (item) {
                                         output += `<a href="#" class="list-group-item list-group-item-action">${item.medicinename}</a>`;
                                     });
                                 } else {
@@ -141,17 +179,17 @@
                     }
                 });
 
-                input.siblings('.suggestion-box').on('click', 'a', function(e) {
+                input.siblings('.suggestion-box').on('click', 'a', function (e) {
                     e.preventDefault();
                     input.val($(this).text());
                     input.siblings('.suggestion-box').hide();
                 });
             }
 
-            $(document).ready(function() {
+            $(document).ready(function () {
                 bindAutocomplete($('.medicine-name').first());
 
-                $('#add-medicine').click(function() {
+                $('#add-medicine').click(function () {
                     let newRow = $('.medicine-row').first().clone();
                     newRow.find('input').val('');
                     newRow.find('.suggestion-box').html('').hide();
@@ -159,13 +197,13 @@
                     bindAutocomplete(newRow.find('.medicine-name'));
                 });
 
-                $(document).on('click', '.remove-row', function() {
+                $(document).on('click', '.remove-row', function () {
                     if ($('.medicine-row').length > 1) {
                         $(this).closest('.medicine-row').remove();
                     }
                 });
 
-                $(document).click(function(e) {
+                $(document).click(function (e) {
                     if (!$(e.target).closest('.medicine-name, .suggestion-box').length) {
                         $('.suggestion-box').hide();
                     }

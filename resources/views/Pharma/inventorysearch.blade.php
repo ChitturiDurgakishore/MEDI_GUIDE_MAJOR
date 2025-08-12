@@ -10,9 +10,9 @@
             <h2 class="mb-4 text-center">🧾 Pharmacy Inventory</h2>
 
             <!-- Search Form -->
-            <form method="POST" action="{{ url('/InventorySearch') }}" class="row mb-4 position-relative">
+            <form method="POST" action="{{ url('/InventorySearch') }}" class="row mb-4 position-relative gx-2 gx-md-3">
                 @csrf
-                <div class="col-md-9 position-relative">
+                <div class="col-12 col-md-9 position-relative mb-2 mb-md-0">
                     <input type="text" name="search" id="search-box" placeholder="Search medicine..."
                            value="{{ request('search') }}" autocomplete="off"
                            class="form-control rounded-md" />
@@ -24,47 +24,46 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100 rounded-md shadow-sm">Search</button>
+                <div class="col-12 col-md-3 d-grid">
+                    <button type="submit" class="btn btn-primary rounded-md shadow-sm w-100">Search</button>
                 </div>
             </form>
 
             <!-- Inventory Table -->
-            <div class="card shadow rounded-lg">
+            <div class="card shadow rounded-lg overflow-auto">
                 <div class="card-body p-0">
-                    <table class="table table-striped mb-0">
+                    <table class="table table-striped mb-0 table-responsive">
                         <thead class="table-dark">
                             <tr>
-                                <th class="py-3 px-4">Medicine Name</th>
-                                <th class="py-3 px-4">Price (₹)</th>
-                                <th class="py-3 px-4">Quantity</th>
-                                <th class="py-3 px-4 text-center">Actions</th> {{-- New column for Adjust button --}}
+                                <th class="py-3 px-3">Medicine Name</th>
+                                <th class="py-3 px-3">Price (₹)</th>
+                                <th class="py-3 px-3">Quantity</th>
+                                <th class="py-3 px-3 text-center">Actions</th> {{-- Adjust button --}}
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Check if $inventory is countable and has exactly one item --}}
                             @if(is_countable($inventory) && count($inventory) === 1)
-                                {{-- If it's a collection with one item, iterate over it --}}
                                 @foreach ($inventory as $inven)
                                 <tr>
-                                    <td class="py-2 px-4">{{ $inven->medicine_name }}</td>
-                                    <td class="py-2 px-4">{{ $inven->price }}</td>
-                                    <td class="py-2 px-4">{{ $inven->quantity }}</td>
-                                    <td class="py-2 px-4 text-center">
-                                        {{-- The 'Adjust' button links to an edit/update page for the specific medicine.
-                                             You'll need to define the route '/inventory/adjust/{id}' in your web.php. --}}
-                                        <a href="{{ url('/inventory/adjust/' . $inven->id) }}" class="btn btn-sm btn-info rounded-md"><i class="fas fa-pencil-alt"></i></a>
+                                    <td class="py-2 px-3">{{ $inven->medicine_name }}</td>
+                                    <td class="py-2 px-3">{{ $inven->price }}</td>
+                                    <td class="py-2 px-3">{{ $inven->quantity }}</td>
+                                    <td class="py-2 px-3 text-center">
+                                        <a href="{{ url('/inventory/adjust/' . $inven->id) }}" class="btn btn-sm btn-info rounded-md" title="Adjust stock">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 @endforeach
                             @elseif ($inventory && !is_countable($inventory) && isset($inventory->medicine_name))
-                                {{-- Handle case where $inventory is a single model object (e.g., from ->first()) and is not countable but exists --}}
                                 <tr>
-                                    <td class="py-2 px-4">{{ $inventory->medicine_name }}</td>
-                                    <td class="py-2 px-4">{{ $inventory->price }}</td>
-                                    <td class="py-2 px-4">{{ $inventory->quantity }}</td>
-                                    <td class="py-2 px-4 text-center">
-                                        <a href="{{ url('/inventory/adjust/' . $inventory->id) }}" class="btn btn-sm btn-info rounded-md"><i class="fas fa-pencil-alt"></i></a>
+                                    <td class="py-2 px-3">{{ $inventory->medicine_name }}</td>
+                                    <td class="py-2 px-3">{{ $inventory->price }}</td>
+                                    <td class="py-2 px-3">{{ $inventory->quantity }}</td>
+                                    <td class="py-2 px-3 text-center">
+                                        <a href="{{ url('/inventory/adjust/' . $inventory->id) }}" class="btn btn-sm btn-info rounded-md" title="Adjust stock">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @else
@@ -78,8 +77,6 @@
             </div>
 
             <!-- Pagination -->
-            {{-- This pagination will only work if $inventory is a Paginator instance,
-                 and we need to ensure $inventory is not null before calling method_exists --}}
             @if($inventory && method_exists($inventory, 'links'))
             <div class="mt-4 d-flex justify-content-center">
                 {{ $inventory->appends(['search' => request('search')])->links('pagination::bootstrap-5') }}
@@ -102,7 +99,6 @@
                                 let output = '';
                                 if (data.length > 0) {
                                     data.forEach(function (item) {
-                                        // Ensure the item.medicine_name is correctly accessed
                                         output += `<a href="#" class="list-group-item list-group-item-action">${item.medicine_name}</a>`;
                                     });
                                 } else {
@@ -125,8 +121,6 @@
                     e.preventDefault();
                     $('#search-box').val($(this).text());
                     $('#suggestion-box').hide();
-                    // Optionally, trigger the form submission when a suggestion is clicked
-                    // $(this).closest('form').submit();
                 });
 
                 // Hide on outside click
@@ -137,5 +131,32 @@
                 });
             });
         </script>
+
+        <style>
+            /* Make the suggestion box full width on mobile */
+            @media (max-width: 767.98px) {
+                #suggestion-box {
+                    max-width: 100vw !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    border-radius: 0 !important;
+                }
+            }
+
+            /* Smaller padding for table cells on mobile */
+            @media (max-width: 575.98px) {
+                table.table td,
+                table.table th {
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.9rem;
+                }
+
+                /* Make the "Actions" column buttons smaller */
+                .btn-sm {
+                    padding: 0.25rem 0.5rem;
+                    font-size: 0.75rem;
+                }
+            }
+        </style>
     </x-slot>
 </x-pharma-layout>

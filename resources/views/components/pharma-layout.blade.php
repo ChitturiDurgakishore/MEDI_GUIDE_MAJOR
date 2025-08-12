@@ -8,8 +8,7 @@
 
   <!-- Bootstrap + Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
   <style>
@@ -24,13 +23,15 @@
 
     .header {
       background-color: #1a202c;
-      padding: 1rem 2rem;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid #0ea5e9;
       height: 72px;
-      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     .header-title {
@@ -44,6 +45,7 @@
       color: #38bdf8;
       font-weight: 600;
       margin-right: 1rem;
+      font-size: 0.95rem;
     }
 
     .logout-btn {
@@ -78,16 +80,16 @@
       position: sticky;
       top: 72px;
       overflow-y: auto;
+      transition: transform 0.3s ease-in-out;
     }
 
-    .sidebar .nav {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      flex-grow: 1;
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+      position: fixed;
+      z-index: 999;
     }
 
-    .sidebar a {
+    .sidebar .nav a {
       padding: 1rem 1rem;
       color: #cbd5e1;
       text-decoration: none;
@@ -102,7 +104,7 @@
       font-size: 1rem;
     }
 
-    .sidebar a:hover {
+    .sidebar .nav a:hover {
       background-color: #0ea5e9;
       color: #fff;
     }
@@ -126,7 +128,6 @@
       text-shadow: 0 0 8px #22d3eeaa;
     }
 
-    /* Scrollbar styles for main content */
     .main-content::-webkit-scrollbar {
       width: 8px;
     }
@@ -141,25 +142,42 @@
       border: 2px solid #1e293b;
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        top: 0;
-        border-bottom: 2px solid #0ea5e9;
-        flex-shrink: 1;
-        padding: 1rem;
-      }
+    .sidebar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #a3e635;
+      margin-right: 1rem;
+    }
 
+    @media (max-width: 768px) {
       .layout {
         flex-direction: column;
         height: auto;
       }
 
+      .sidebar {
+        width: 240px;
+        height: 100%;
+        position: fixed;
+        top: 72px;
+        left: 0;
+        z-index: 1050;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .sidebar-toggle {
+        display: inline-block;
+      }
+
       .main-content {
-        overflow-y: visible;
         padding: 1rem;
+        overflow-y: visible;
       }
     }
   </style>
@@ -169,7 +187,10 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="header-title">Medi-Guide</div>
+    <div class="d-flex align-items-center">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="header-title">Medi-Guide</div>
+    </div>
     <div class="d-flex align-items-center">
       <span class="pharmacy-name">{{ session('Pharmacy') }}</span>
       <form action="{{ url('/logout') }}" method="get" class="mb-0">
@@ -181,15 +202,15 @@
   <!-- Layout -->
   <div class="layout">
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <nav class="nav flex-column">
         <a href="{{ url('/dashboard') }}"><i class="bi bi-app"></i> DashBoard</a>
         <a href="{{ url('/pharmacy/inventory') }}"><i class="bi bi-box-seam"></i> Inventory</a>
         <a href="{{ url('/pharmacy/entry') }}"><i class="bi bi-pencil-square"></i> Entry</a>
         <a href="{{ url('/pharmacy/adjust') }}"><i class="bi bi-sliders"></i> Adjust</a>
         <a href="{{ url('/pharmacy/import') }}"><i class="bi bi-cloud-arrow-down"></i> Import</a>
-        <a href="{{ url('/pharmacy/predictions') }}"><i class="bi bi-question-diamond"></i></i> Predictions</a>
-        <a href="{{ url('/medicine-request') }}"><i class="bi bi-arrow-down-right-square"></i></i>Requests</a>
+        <a href="{{ url('/pharmacy/predictions') }}"><i class="bi bi-question-diamond"></i> Predictions</a>
+        <a href="{{ url('/medicine-request') }}"><i class="bi bi-arrow-down-right-square"></i> Requests</a>
         <a href="{{ url('/pharmacy/history') }}"><i class="bi bi-hourglass-split"></i> History</a>
       </nav>
     </aside>
@@ -199,9 +220,13 @@
       {{ $MainContent }}
     </main>
   </div>
-
-  <!-- Bootstrap JS -->
+  <!-- Bootstrap JS + Sidebar Toggle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("show");
+    }
+  </script>
 </body>
-
 </html>

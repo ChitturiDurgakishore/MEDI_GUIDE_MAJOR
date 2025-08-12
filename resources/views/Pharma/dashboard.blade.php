@@ -3,16 +3,16 @@
         <div class="container py-4">
 
             <!-- 🔢 Sales Summary Section -->
-            <div class="row mb-5">
-                <div class="col-md-6">
-                    <div class="card bg-dark text-white shadow-neon p-4">
-                        <h5 class="text-cyan ">📆 Today’s Sales</h5>
+            <div class="row mb-4">
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                    <div class="card bg-dark text-white shadow-neon p-4 h-100">
+                        <h5 class="text-cyan">📆 Today’s Sales</h5>
                         <h3 class="fw-bold mt-2">₹{{ number_format($todaySales, 2) }}</h3>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="card bg-dark text-white shadow-neon p-4">
+                <div class="col-12 col-md-6">
+                    <div class="card bg-dark text-white shadow-neon p-4 h-100">
                         <h5 class="text-lime">📅 Monthly Sales</h5>
                         <h3 class="fw-bold mt-2">₹{{ number_format($monthSales, 2) }}</h3>
                     </div>
@@ -20,7 +20,7 @@
             </div>
 
             <!-- 💡 Why Medi-Guide Section -->
-            <div class="bg-dark p-4 rounded mb-5 shadow-neon">
+            <div class="bg-dark p-4 rounded mb-5 shadow-neon text-center text-md-start">
                 <h4 class="text-cyan-neon mb-4 fw-semibold text-center" style="text-shadow: 0 0 8px #22d3ee;">
                     Why Medi-Guide?
                 </h4>
@@ -45,7 +45,9 @@
 
             <!-- ⚙️ Dashboard Options Section -->
             <div class="bg-secondary p-4 rounded shadow-neon">
-                <h4 class="text-lime-neon mb-4 fw-semibold" style="text-shadow: 0 0 6px #a3e635;">Dashboard Options Guide</h4>
+                <h4 class="text-lime-neon mb-4 fw-semibold text-center text-md-start" style="text-shadow: 0 0 6px #a3e635;">
+                    Dashboard Options Guide
+                </h4>
                 <div class="row g-4">
                     @php
                         $options = [
@@ -83,7 +85,7 @@
                     @endphp
 
                     @foreach ($options as $option)
-                        <div class="col-md-6 @if ($option['title'] == 'Alerts') col-md-12 @endif">
+                        <div class="col-12 col-md-6 @if ($option['title'] == 'Alerts') col-md-12 @endif">
                             <div class="border p-3 rounded bg-dark text-light option-card h-100 d-flex flex-column">
                                 <h5 class="mb-3">
                                     <i class="bi bi-{{ $option['icon'] }} me-2 {{ $option['color'] }}" style="filter: drop-shadow(0 0 4px currentColor);"></i>
@@ -95,7 +97,6 @@
                     @endforeach
                 </div>
             </div>
-
         </div>
 
         <!-- 🖌️ Styles -->
